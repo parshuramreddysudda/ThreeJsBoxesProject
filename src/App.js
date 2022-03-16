@@ -4,19 +4,19 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import './App.scss';
 
 
-const Box = () => {
+const SpinnerMesh = ({ position, args, color }) => {
 
   const mesh = useRef(null);
   useFrame(() => (
     mesh.current.rotation.x = mesh.current.rotation.y += 0.01
   ));
   return (
-    <mesh ref={mesh}>
+    <mesh castShadow position={position} ref={mesh}>
       <boxBufferGeometry
         attach='geometry'
-        args={[1, 1, 1]}
+        args={args}
       />
-      <meshStandardMaterial attach='material' color='red' />
+      <meshStandardMaterial attach='material' color={color} />
 
     </mesh>
 
@@ -28,9 +28,47 @@ function App() {
 
   return (
     <>
-      <Canvas>
-        <ambientLight intensity={.3} />
-        <Box />
+      <Canvas
+        shadowMap
+        colorManagement
+        camera={{ position: [-5, 2, 10], fov: 70 }} >
+
+
+        <ambientLight intensity={0.3} />
+
+        <directionalLight
+          castShadow
+          position={[0, 10, 0]}
+          intensity={1.5}
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+          shadow-camera-far={50}
+          shadow-camera-left={-10}
+          shadow-camera-right={10}
+          shadow-camera-top={10}
+          shadow-camera-bottom={-10}
+
+        />
+        <pointLight position={[-10, 0, -20]} intensity={0.5} />
+        <pointLight position={[0, 1, 0]} intensity={1.5} />
+
+        <group>
+          <mesh
+            receiveShadow
+            rotation={[-Math.PI / 2, 0, 0]}
+            position={[0, - 3, 0]}>
+
+            <planeBufferGeometry attach='geometry' args={[100, 100]} />
+            <shadowMaterial attach='material' />
+            {/* This will need to cast a shadow */}
+            {/* <meshStandardMaterial attach='material' color={'yellow'} /> */}
+          </mesh>
+          <SpinnerMesh position={[0, 1, 0]} args={[3, 2, 1]} color='lightblue' />
+          <SpinnerMesh position={[-2, 1, -5]} color='pink' />
+          <SpinnerMesh position={[5, 1, 2]} color='pink' />
+          <SpinnerMesh position={[0, 4, 0]} args={[1, 1, 1]} color='pink' />
+        </group>
+
       </Canvas>
     </>
   );
